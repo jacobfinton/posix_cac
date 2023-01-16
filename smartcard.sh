@@ -87,11 +87,12 @@ module_check ()
             if [ "$option" = "opensc" ]; then
                 opensc_install
             elif [ "$option" = "coolkey" ]; then
-                 print_style "TODO\n" "danger"
-                # coolkey_install
+                 print_style "WIP\n" "danger"
+                coolkey_install
             elif [ "$option" = "cackey" ]; then
                 print_style "TODO\n" "danger"
                 # cackey_install
+                exit "$EXIT_FAILURE"
             else
                 print_style "\n***Nothing installed***\n" "danger"
                 exit "$EXIT_FAILURE"
@@ -104,7 +105,6 @@ opensc_install ()
     print_style "\n***opensc installed successfully***\n" "success"
 }
 
-# TODO
 coolkey_install ()
 {
     $PACKAGE_MANAGER coolkey
@@ -321,12 +321,20 @@ import_certificates ()
             if ! grep 'library=/usr/lib/pkcs11/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib/pkcs11/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
+        elif find /usr/lib64/libcoolkeypk11.so > /dev/null 2>&1; then
+            if ! grep 'library=/usr/lib64/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
+                printf "library=/usr/lib64/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
+            fi
+        elif find /usr/lib64/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then
+            if ! grep 'library=/usr/lib64/pkcs11/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
+                printf "library=/usr/lib64/pkcs11/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
+            fi
         elif find /usr/lib64/libcackey.so > /dev/null 2>&1; then
             if ! grep 'library=/usr/lib64/libcackey.so\|name=CAC Module\n' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib64/libcackey.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
         else
-            print_style "\n***Error***\n" "danger"
+            print_style "\n***Error No module found***\n" "danger"
             exit "$EXIT_FAILURE"
         fi
 

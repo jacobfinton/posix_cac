@@ -15,7 +15,7 @@ This is an alternative to [linux_cac](https://github.com/jdjaxon/linux_cac). The
 |              | 20.04 LTS | Firefox, Chrome | opensc |
 | Manjaro      | 22.0      | Firefox, Chrome | opensc |
 | Fedora       | 37.0      | Firefox, Chrome | opensc |
-| openSUSE     | Tumbleweed| Firefox, Chrome | opensc |
+| openSUSE     | Tumbleweed| Firefox, Chrome | opensc, coolkey |
 
 ## TODO
 1. Add cackey and coolkey support
