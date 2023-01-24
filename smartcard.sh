@@ -77,28 +77,28 @@ install_middleware ()
 # PKCS #11 module the user wants to use ex. opensc vs cackey
 module_check ()
 {
-            option=''
-            while [ "$option" != "opensc" ] && [ "$option" != "coolkey" ] && [ "$option" != "cackey" ]
-            do
-                printf "\nWould you like to install "
-                print_style "[opensc, coolkey, cackey]?\n" "warning"
-                read -r option
-            done
-            if [ "$option" = "opensc" ]; then
-                opensc_install
-            elif [ "$option" = "coolkey" ]; then
-                 print_style "WIP\n" "danger"
-                coolkey_install
-            elif [ "$option" = "cackey" ]; then
-                print_style "TODO\n" "danger"
-                # cackey_install
-                exit "$EXIT_FAILURE"
-            else
-                print_style "\n***Nothing installed***\n" "danger"
-                exit "$EXIT_FAILURE"
-            fi
+    option=''
+    while [ "$option" != "opensc" ] && [ "$option" != "coolkey" ] && [ "$option" != "cackey" ]
+    do
+        printf "\nChoose a PKCS11 Module "
+        print_style "[opensc(RECOMMENDED), coolkey(WIP), cackey(WIP)]?\n" "warning"
+        read -r option
+    done
+    if [ "$option" = "opensc" ]; then
+        opensc_install
+    elif [ "$option" = "coolkey" ]; then
+        print_style "WIP\n" "danger"
+        coolkey_install
+    elif [ "$option" = "cackey" ]; then
+        print_style "WIP\n" "danger"
+        cackey_install
+    else
+        print_style "\n***Nothing installed***\n" "danger"
+        exit "$EXIT_FAILURE"
+    fi
 }
 
+# Recommended
 opensc_install ()
 {
     $PACKAGE_MANAGER opensc
@@ -111,12 +111,36 @@ coolkey_install ()
     print_style "\n***coolkey installed successfully***\n" "success"
 }
 
-# TODO
+
 cackey_install ()
 {
-    CACKEY_URL="http://cackey.rkeene.org/download/"
-
-    wget -qP "$TEMP_DIR" "$CACKEY_URL"
+    VERSION=$(uname -m)
+    if type dpkg > /dev/null 2>&1; then
+        if [ "$VERSION" = "x86_64" ]; then
+            CACKEY_BUNDLE="cackey_0.7.5-1_amd64.deb"
+        elif [ "$VERSION" = "x86" ]; then
+            CACKEY_BUNDLE="cackey_0.7.5-1_i386.deb"
+        else
+            print_style "\n***CACKEY does not support your system. Please choose another module.***\n" "danger"
+        fi
+        CACKEY_URL="https://cackey.rkeene.org/download/0.7.5/$CACKEY_BUNDLE"
+        wget -qP "$TEMP_DIR" "$CACKEY_URL"
+        dpkg -i "$TEMP_DIR/$CACKEY_BUNDLE"
+    elif type rpm > /dev/null 2>&1; then 
+        if [ "$VERSION" = "x86_64" ]; then
+            CACKEY_BUNDLE="cackey-0.7.5-1.x86_64.rpm"
+        elif [ "$VERSION" = "x86" ]; then
+            CACKEY_BUNDLE="cackey-0.7.5-1.i386.rpm"
+        else
+            print_style "\n***CACKEY does not support your system. Please choose another module.***\n" "danger"
+        fi
+        CACKEY_URL="https://cackey.rkeene.org/download/0.7.5/$CACKEY_BUNDLE"
+        wget -qP "$TEMP_DIR" "$CACKEY_URL"
+        rpm -i "$TEMP_DIR/$CACKEY_BUNDLE"
+    else
+        print_style "\n***CACKEY does not support your system. Please choose another module.***\n" "danger"
+        exit $EXIT_FAILURE
+    fi
 
     print_style "\n***cackey installed successfully***\n" "success"
 }
@@ -141,8 +165,11 @@ certificate_check ()
 # Installs DOD certificates
 certificate_install ()
 {
-    PKCS_FILE="pkcs11.txt" # TODO Will be replaced with modutil
-    CERT_FILE="DoD_Approved_External_PKIs_Trust_Chains_v9.5_20221018/_DoD/Intermediate_and_Issuing_CA_Certs"
+    # TODO Will be replaced when modutil is implemented
+    PKCS_FILE="pkcs11.txt"
+    VERSION_FILE="DoD_Approved_External_PKIs_Trust_Chains_v"
+    # shellcheck disable=SC2125
+    CERT_FILE="$VERSION_FILE"*"/_DoD/Intermediate_and_Issuing_CA_Certs"
     ZIP_FILE="unclass-dod_approved_external_pkis_trust_chains.zip"
     PKI_URL="https://dl.dod.cyber.mil/wp-content/uploads/pki-pke/zip/$ZIP_FILE"
 
@@ -167,8 +194,9 @@ nettool_check ()
     if type wget > /dev/null; then
         print_style "wget is installed and will be used\n" "info"
         wget -qP "$TEMP_DIR" "$PKI_URL"
-    elif type curl > /dev/null; then # TODO
+    elif type curl > /dev/null; then 
         print_style "curl is installed and will be used\n" "info"
+        curl -s "$PKI_URL" --output "$TEMP_DIR/$ZIP_FILE"
     else
         print_style "You currently do not have a network client like wget or curl\n" "warning"
 
@@ -239,14 +267,14 @@ certutil_check ()
 
 browser_check ()
 {
-    ff_installed=false
-    chrome_installed=false
+    browser_installed=false
 
     print_style "\n***Looking for Browsers***\n" "info"
-    check_for_firefox
-    check_for_chrome
+    # Currently supported browsers
+    find_firefox
+    find_chrome
 
-    if [ "$ff_installed" = true ] || [ "$chrome_installed" = true ]; then
+    if [ "$browser_installed" = true ]; then
         import_certificates
     else
         print_style "\n***No version of Mozilla Firefox or Chrome installed***\n" "danger"
@@ -255,10 +283,11 @@ browser_check ()
     fi
 }
 
-check_for_firefox ()
+find_firefox ()
 {
     if type firefox > /dev/null; then
-        ff_installed=true
+        browser_installed=true
+        # TODO SNAP FAILURE
         print_style "\n***Found Firefox***\n" "info"
         print_style "\n***Running firefox to generate databases***\n" "info"
         sudo -u "$SUDO_USER" firefox --headless --first-startup > /dev/null 2>&1 &
@@ -275,17 +304,19 @@ check_for_firefox ()
     fi
 }
 
-check_for_chrome ()
+find_chrome ()
 {
     if type google-chrome > /dev/null; then
-        chrome_installed=true
         print_style "\n***Found Google Chrome***\n" "info"
+        browser_installed=true
     else
         print_style "\n***Chrome not found***\n" "warning"
     fi
 }
 
 # TODO Reduce
+## modutil is currently having indeterministic behavior on firefox
+## modutil -dbdir sql:"$nss_dir" -add "CAC Module" -libfile "/usr/lib/opensc-pkcs11.so"
 import_certificates ()
 {
     print_style "\n***Starting Import***\n" "info"
@@ -293,12 +324,7 @@ import_certificates ()
     find ~/.mozilla* ~/snap/firefox/common/.mozilla* /home/*/.mozilla* /home/*/snap/firefox/common/.mozilla* ~/.pki /home/*/.pki -name "cert9.db" > tmp
     while IFS= read -r nss_db
     do
-        # TODO Check for no databases found
         nss_dir=$(dirname "$nss_db");
-
-        # Load CAC Module
-        ## TODO modutil is currently having indeterministic behavior on firefox
-        ## modutil -dbdir sql:"$nss_dir" -add "CAC Module" -libfile "/usr/lib/opensc-pkcs11.so"
         print_style "\n***Saving CAC Module into $nss_dir***\n" "info"
 
         if find /usr/lib/opensc-pkcs11.so > /dev/null 2>&1; then
@@ -341,12 +367,17 @@ import_certificates ()
         print_style "\n***Loading certificates into $nss_dir***\n" "info"
 
         # Import certificate into pki DB
-        for cert in "$TEMP_DIR/$CERT_FILE/"*."cer"
+        # shellcheck disable=SC2231
+        for cert in ${TEMP_DIR}/${CERT_FILE}/*".cer"
         do
             echo "$cert"
             certutil -d sql:"$nss_dir" -A -t TC -n "$cert" -i "$cert"
         done
     done < tmp
+    if [ ! -s tmp ]; then
+        print_style "\n***No databases found***\n"
+        exit $EXIT_FAILURE
+    fi
     rm tmp
     print_style "\n***All certificates imported and CAC Module Added***\n" "success"
 
