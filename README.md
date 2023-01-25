@@ -19,11 +19,10 @@ This is an alternative to [linux_cac](https://github.com/jdjaxon/linux_cac). The
 | Fedora       | 37.0      | Firefox, Chrome | opensc |
 | openSUSE     | Tumbleweed| Firefox, Chrome | opensc, coolkey, cackey |
 
-## TODO
+## Current TODO
 1. Add cackey and coolkey support (WIP Need to keep testing)
-2. Update to use modutils instead of printf on pkcs11.txt files
+2. Update to use modutils instead of printf on pkcs11.txt files (WIP)
 3. Add support for Ubuntu 21.10+ with removal of snap images.(May just wait for the fix)
-4. Add double check all browsers are closed
 
 ## References
 - https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html

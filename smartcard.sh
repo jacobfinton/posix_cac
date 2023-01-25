@@ -7,6 +7,7 @@ main()
     TEMP_DIR="/tmp"
 
     root_check
+    process_check
     install_middleware
     module_check
     certificate_check
@@ -41,6 +42,16 @@ root_check ()
 {
     if [ "$(id -u)" -ne 0 ] ;then
         print_style "\n***Must be run as root***\n" "danger"
+        exit "$EXIT_FAILURE"
+    fi
+}
+
+# Double checks that all browsers are closed before running anything else
+process_check ()
+{
+    # shellcheck disable=SC2009
+    if ps -A | grep -E "\<chrome\>|\<firefox\>"; then
+        print_style "\n***All browsers must be closed to run***\n" "danger"
         exit "$EXIT_FAILURE"
     fi
 }
@@ -101,14 +112,22 @@ module_check ()
 # Recommended
 opensc_install ()
 {
-    $PACKAGE_MANAGER opensc
-    print_style "\n***opensc installed successfully***\n" "success"
+    if $PACKAGE_MANAGER opensc; then
+        print_style "\n***opensc installed successfully***\n" "success"
+    else
+        print_style "\n***Install did not to work***\n" "danger"
+        exit $EXIT_FAILURE
+    fi
 }
 
 coolkey_install ()
 {
-    $PACKAGE_MANAGER coolkey
-    print_style "\n***coolkey installed successfully***\n" "success"
+    if $PACKAGE_MANAGER coolkey; then
+        print_style "\n***coolkey installed successfully***\n" "success"
+    else
+        print_style "\n***Install did not to work***\n" "danger"
+        exit $EXIT_FAILURE
+    fi
 }
 
 
@@ -192,13 +211,13 @@ download_check ()
 nettool_check ()
 {
     if type wget > /dev/null; then
-        print_style "wget is installed and will be used\n" "info"
+        print_style "\nwget is installed and will be used\n" "info"
         wget -qP "$TEMP_DIR" "$PKI_URL"
     elif type curl > /dev/null; then 
-        print_style "curl is installed and will be used\n" "info"
+        print_style "\ncurl is installed and will be used\n" "info"
         curl -s "$PKI_URL" --output "$TEMP_DIR/$ZIP_FILE"
     else
-        print_style "You currently do not have a network client like wget or curl\n" "warning"
+        print_style "\nYou currently do not have a network client like wget or curl\n" "warning"
 
         option=''
         while [ "$option" != "y" ] && [ "$option" != "n" ]
@@ -208,7 +227,7 @@ nettool_check ()
         done
         if [ "$option" = "y" ]; then
             $PACKAGE_MANAGER wget
-            print_style "wget has been installed\n" "info"
+            print_style "\nwget has been installed\n" "info"
         else
             print_style "\n***Nothing installed***\n" "danger"
             exit "$EXIT_FAILURE"
@@ -220,7 +239,7 @@ unzip_check ()
 {
     # unzip check
     if type unzip > /dev/null; then
-        print_style "unzip is installed and will be used\n" "info"
+        print_style "\nunzip is installed and will be used\n" "info"
     else
         OPTION=''
         while [ "$OPTION" != "y" ] && [ "$OPTION" != "n" ]
@@ -230,7 +249,7 @@ unzip_check ()
         done
         if [ "$OPTION" = "y" ]; then
             $PACKAGE_MANAGER unzip
-            print_style "unzip has been installed\n" "info"
+            print_style "\nunzip has been installed\n" "info"
         else
             print_style "\n***Nothing installed***\n" "danger"
             exit "$EXIT_FAILURE"
@@ -254,6 +273,7 @@ certutil_check ()
             read -r option
         done
         if [ "$option" = "y" ]; then
+            # Different packages for each system. Just allow them to fail and try the next currently
             $PACKAGE_MANAGER libnss3-tools
             $PACKAGE_MANAGER nss-tools
             $PACKAGE_MANAGER mozilla-nss-tools
