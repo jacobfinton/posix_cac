@@ -1,0 +1,22 @@
+name: 'shellcheck'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "develop"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: -s sh -e SC2317
