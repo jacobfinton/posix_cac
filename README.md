@@ -6,8 +6,7 @@ This is an alternative to [linux_cac](https://github.com/jdjaxon/linux_cac). The
 
 ## Usage
 1. Download smartcard.sh
-2. If a browser is currently running, you should exit it before continuing.
-3. sudo ./smartcard.sh
+2. sudo ./smartcard.sh
 
 ## Supported Systems
 | Distribution | Versions  |    Browsers     |     PKCS11 Modules     |
