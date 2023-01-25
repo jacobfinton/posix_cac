@@ -14,6 +14,7 @@ This is an alternative to [linux_cac](https://github.com/jdjaxon/linux_cac). The
 | Debian       | 11        | Firefox, Chrome | opensc |
 | Ubuntu       | 18.04 LTS | Firefox, Chrome | opensc, cackey |
 |              | 20.04 LTS | Firefox, Chrome | opensc, cackey |
+|              | 22.04 LTS | Firefox(Non Snap), Chrome | opensc |
 | Manjaro      | 22.0      | Firefox, Chrome | opensc |
 | Fedora       | 37.0      | Firefox, Chrome | opensc |
 | openSUSE     | Tumbleweed| Firefox, Chrome | opensc, coolkey, cackey |
