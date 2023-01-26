@@ -2,7 +2,7 @@
 ## Introduction 
 This is an alternative to [linux_cac](https://github.com/jdjaxon/linux_cac). The script avoids bashisms to conform to the POSIX standard. It also supports several different package managers. Though this script gives the option for several different PKCS11 modules. [opensc](https://github.com/OpenSC/OpenSC) is the recommended module as it is supported on more systems and actively maintained.
 
-**Warning** Currently snap images do not support adding PKCS11 modules. 
+**Warning** Currently snap packaged browsers do not support adding PKCS11 modules (Ex. Firefox on Ubuntu 21.10+). If the script sees you are currently using a snap browser it will not continue. This can be fixed by removing that package and installing a non snap version of your browser.
 
 ## Usage
 1. Download smartcard.sh
@@ -19,10 +19,8 @@ This is an alternative to [linux_cac](https://github.com/jdjaxon/linux_cac). The
 | Fedora       | 37.0      | Firefox, Chrome | opensc |
 | openSUSE     | Tumbleweed| Firefox, Chrome | opensc, coolkey, cackey |
 
-## Current TODO
-1. Add cackey and coolkey support (WIP Need to keep testing)
-2. Update to use modutils instead of printf on pkcs11.txt files (WIP)
-3. Add support for Ubuntu 21.10+ with removal of snap images.(May just wait for the fix)
+## Contribute
+Code contributions are welcome! Please commit any pull requests against the main branch.
 
 ## References
 - https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html

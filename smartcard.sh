@@ -306,19 +306,22 @@ browser_check ()
 find_firefox ()
 {
     if type firefox > /dev/null; then
-        browser_installed=true
-        # TODO SNAP FAILURE
-        print_style "\n***Found Firefox***\n" "info"
-        print_style "\n***Running firefox to generate databases***\n" "info"
-        sudo -u "$SUDO_USER" firefox --headless --first-startup > /dev/null 2>&1 &
-        sleep 3
-        pkill -9 firefox
-        sleep 2
-        # Run a second time just in case to produce profiles
-        sudo -u "$SUDO_USER" firefox --headless > /dev/null 2>&1 &
-        sleep 3
-        pkill -9 firefox
-        sleep 2
+        if type firefox | grep snap; then
+            print_style "\n***Skipping Firefox. Your firefox is currently a snap package. Please remove and install a non snap version and then rerun this script.***\n" "warning"
+        else
+            browser_installed=true
+            print_style "\n***Found Firefox***\n" "info"
+            print_style "\n***Running firefox to generate databases***\n" "info"
+            sudo -u "$SUDO_USER" firefox --headless --first-startup > /dev/null 2>&1 &
+            sleep 3
+            pkill -9 firefox
+            sleep 2
+            # Run a second time just in case to produce profiles
+            sudo -u "$SUDO_USER" firefox --headless > /dev/null 2>&1 &
+            sleep 3
+            pkill -9 firefox
+            sleep 2
+        fi
     else
         print_style "\n***Firefox not found***\n" "warning"
     fi
@@ -341,7 +344,7 @@ import_certificates ()
 {
     print_style "\n***Starting Import***\n" "info"
 
-    find ~/.mozilla* ~/snap/firefox/common/.mozilla* /home/*/.mozilla* /home/*/snap/firefox/common/.mozilla* ~/.pki /home/*/.pki -name "cert9.db" > tmp
+    find ~/.mozilla* /home/*/.mozilla* ~/.pki /home/*/.pki -name "cert9.db" > tmp
     while IFS= read -r nss_db
     do
         nss_dir=$(dirname "$nss_db");
