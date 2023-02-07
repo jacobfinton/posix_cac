@@ -184,8 +184,6 @@ certificate_check ()
 # Installs DOD certificates
 certificate_install ()
 {
-    # TODO Will be replaced when modutil is implemented
-    PKCS_FILE="pkcs11.txt"
     VERSION_FILE="DoD_Approved_External_PKIs_Trust_Chains_v"
     # shellcheck disable=SC2125
     CERT_FILE="$VERSION_FILE"*"/_DoD/Intermediate_and_Issuing_CA_Certs"
@@ -337,9 +335,6 @@ find_chrome ()
     fi
 }
 
-# TODO Reduce
-## modutil is currently having indeterministic behavior on firefox
-## modutil -dbdir sql:"$nss_dir" -add "CAC Module" -libfile "/usr/lib/opensc-pkcs11.so"
 import_certificates ()
 {
     print_style "\n***Starting Import***\n" "info"
@@ -350,38 +345,22 @@ import_certificates ()
         nss_dir=$(dirname "$nss_db");
         print_style "\n***Saving CAC Module into $nss_dir***\n" "info"
 
-        if find /usr/lib/opensc-pkcs11.so > /dev/null 2>&1; then
-            if ! grep 'library=/usr/lib/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
-        elif find /usr/lib64/opensc-pkcs11.so > /dev/null 2>&1; then
-            if ! grep 'library=/usr/lib64/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib64/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+        if find /usr/lib64/opensc-pkcs11.so > /dev/null 2>&1; then
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir" -libfile "/usr/lib64/opensc-pkcs11.so"
+        elif find /usr/lib/opensc-pkcs11.so > /dev/null 2>&1; then
+            sudo -u "$SUDO_USER" modutil -force -add 'CAC Module' -dbdir sql:"$nss_dir" -libfile "/usr/lib/opensc-pkcs11.so"
         elif find /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so > /dev/null 2>&1; then # Ubuntu 18.04
-            if ! grep 'library=/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir" -libfile "/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so"
         elif find /usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so > /dev/null 2>&1; then # Ubuntu 20.04
-            if ! grep 'library=/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir" -libfile "/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so"
         elif find /usr/lib/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then
-            if ! grep 'library=/usr/lib/pkcs11/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib/pkcs11/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir"  -libfile "/usr/lib/pkcs11/libcoolkeypk11.so"
         elif find /usr/lib64/libcoolkeypk11.so > /dev/null 2>&1; then
-            if ! grep 'library=/usr/lib64/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib64/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir" -libfile "/usr/lib64/libcoolkeypk11.so"
         elif find /usr/lib64/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then
-            if ! grep 'library=/usr/lib64/pkcs11/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib64/pkcs11/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir" -libfile "/usr/lib64/pkcs11/libcoolkeypk11.so"
         elif find /usr/lib64/libcackey.so > /dev/null 2>&1; then
-            if ! grep 'library=/usr/lib64/libcackey.so\|name=CAC Module\n' "$nss_dir/$PKCS_FILE" >/dev/null; then
-                printf "library=/usr/lib64/libcackey.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
-            fi
+            sudo -u "$SUDO_USER" modutil -force -add "CAC Module" -dbdir sql:"$nss_dir" -libfile "/usr/lib64/libcackey.so"
         else
             print_style "\n***Error No module found***\n" "danger"
             exit "$EXIT_FAILURE"

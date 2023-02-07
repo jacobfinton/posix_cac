@@ -26,7 +26,7 @@ Code contributions are welcome! Please commit any pull requests against the main
 - https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html
 - https://militarycac.com/linux.htm
 - https://github.com/jdjaxon/linux_cac
-- https://public.cyber.mil/pki-pke/end-users/getting-started/linux-firefox/
-- https://public.cyber.mil/pki-pke/admins/#toggle-id-6-closed
-- https://public.cyber.mil/pki-pke/end-users/getting-started/#toggle-id-3
+- https://public.cyber.mil/pki-pke/admins/
+- https://public.cyber.mil/pki-pke/end-users/getting-started/
 - https://en.opensuse.org/DoD_Common_Access_Card_(CAC)_Reader
+- https://firefox-source-docs.mozilla.org/security/nss/legacy/tools/modutil/index.html
