@@ -89,18 +89,18 @@ install_middleware ()
 module_check ()
 {
     option=''
-    while [ "$option" != "opensc" ] && [ "$option" != "coolkey" ] && [ "$option" != "cackey" ]
+    while [ "$option" != "1" ] && [ "$option" != "2" ] && [ "$option" != "3" ]
     do
         printf "\nChoose a PKCS11 Module "
-        print_style "[opensc(RECOMMENDED), coolkey(WIP), cackey(WIP)]?\n" "warning"
+        print_style "(1) opensc(RECOMMENDED), (2) coolkey(WIP), (3) cackey(WIP)\n" "warning"
         read -r option
     done
-    if [ "$option" = "opensc" ]; then
+    if [ "$option" = "1" ]; then
         opensc_install
-    elif [ "$option" = "coolkey" ]; then
+    elif [ "$option" = "2" ]; then
         print_style "WIP\n" "danger"
         coolkey_install
-    elif [ "$option" = "cackey" ]; then
+    elif [ "$option" = "3" ]; then
         print_style "WIP\n" "danger"
         cackey_install
     else
@@ -129,7 +129,6 @@ coolkey_install ()
         exit $EXIT_FAILURE
     fi
 }
-
 
 cackey_install ()
 {
@@ -274,9 +273,9 @@ certutil_check ()
         done
         if [ "$option" = "y" ]; then
             # Different packages for each system. Just allow them to fail and try the next currently
-            $PACKAGE_MANAGER libnss3-tools
-            $PACKAGE_MANAGER nss-tools
-            $PACKAGE_MANAGER mozilla-nss-tools
+            $PACKAGE_MANAGER libnss3-tools 2> /dev/null
+            $PACKAGE_MANAGER nss-tools 2> /dev/null
+            $PACKAGE_MANAGER mozilla-nss-tools 2> /dev/null
             print_style "\n***Certutils has been installed***\n" "info"
         else
             print_style "\n***Nothing installed***\n" "danger"
