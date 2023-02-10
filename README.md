@@ -30,3 +30,4 @@ Code contributions are welcome! Please commit any pull requests against the main
 - https://public.cyber.mil/pki-pke/end-users/getting-started/
 - https://en.opensuse.org/DoD_Common_Access_Card_(CAC)_Reader
 - https://firefox-source-docs.mozilla.org/security/nss/legacy/tools/modutil/index.html
+- https://wiki.archlinux.org/title/Smartcards

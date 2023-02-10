@@ -312,12 +312,12 @@ find_firefox ()
             print_style "\n***Running firefox to generate databases***\n" "info"
             sudo -u "$SUDO_USER" firefox --headless --first-startup > /dev/null 2>&1 &
             sleep 3
-            pkill -9 firefox
+            pkill -9 firefox > /dev/null 2>&1
             sleep 2
             # Run a second time just in case to produce profiles
             sudo -u "$SUDO_USER" firefox --headless > /dev/null 2>&1 &
             sleep 3
-            pkill -9 firefox
+            pkill -9 firefox > /dev/null 2>&1
             sleep 2
         fi
     else
@@ -330,6 +330,11 @@ find_chrome ()
     if type google-chrome > /dev/null; then
         print_style "\n***Found Google Chrome***\n" "info"
         browser_installed=true
+        # Run a second time just in case to produce profiles
+            sudo -u "$SUDO_USER" firefox --headless > /dev/null 2>&1 &
+            sleep 3
+            pkill -9 firefox
+            sleep 2
     else
         print_style "\n***Chrome not found***\n" "warning"
     fi
