@@ -267,7 +267,7 @@ certutil_check ()
         option=''
         while [ "$option" != "y" ] && [ "$option" != "n" ]
         do
-            print_style "\ncerutil is needed to auto install DoD certificates\n" "warning"
+            print_style "\ncerutil is needed to auto install DoD certificates" "warning"
             print_style "\nWould you like to install certutil?(y/n)\n" "info"
             read -r option
         done
@@ -339,6 +339,8 @@ find_chrome ()
 # TODO Reduce
 ## modutil is currently having indeterministic behavior on firefox
 ## modutil -dbdir sql:"$nss_dir" -add "CAC Module" -libfile "/usr/lib/opensc-pkcs11.so"
+## modutil -list -dbdir list all modules to remove any named CAC Module
+## modutil -dbdir sql:"$nss_dir" -delete "CAC Module"
 import_certificates ()
 {
     print_style "\n***Starting Import***\n" "info"
@@ -349,15 +351,15 @@ import_certificates ()
         nss_dir=$(dirname "$nss_db");
         print_style "\n***Saving CAC Module into $nss_dir***\n" "info"
 
-        if find /usr/lib/opensc-pkcs11.so > /dev/null 2>&1; then
+        if find /usr/lib/opensc-pkcs11.so > /dev/null 2>&1; then # Common
             if ! grep 'library=/usr/lib/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
-        elif find /usr/lib64/opensc-pkcs11.so > /dev/null 2>&1; then
+        elif find /usr/lib64/opensc-pkcs11.so > /dev/null 2>&1; then # Common
             if ! grep 'library=/usr/lib64/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib64/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
-        elif find /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so > /dev/null 2>&1; then # Ubuntu 18.04
+        elif find /usr/lib/x86_64-linux-gnu/opensc-pkcs11.so > /dev/null 2>&1; then # Ubuntu 18.04 and 23.04
             if ! grep 'library=/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
@@ -365,24 +367,24 @@ import_certificates ()
             if ! grep 'library=/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib/x86_64-linux-gnu/pkcs11/opensc-pkcs11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
-        elif find /usr/lib/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then
+        elif find /usr/lib/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then # Common
             if ! grep 'library=/usr/lib/pkcs11/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib/pkcs11/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
-        elif find /usr/lib64/libcoolkeypk11.so > /dev/null 2>&1; then
+        elif find /usr/lib64/libcoolkeypk11.so > /dev/null 2>&1; then # Common
             if ! grep 'library=/usr/lib64/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib64/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
-        elif find /usr/lib64/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then
+        elif find /usr/lib64/pkcs11/libcoolkeypk11.so > /dev/null 2>&1; then # Common
             if ! grep 'library=/usr/lib64/pkcs11/libcoolkeypk11.so\|name=CAC Module' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib64/pkcs11/libcoolkeypk11.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
-        elif find /usr/lib64/libcackey.so > /dev/null 2>&1; then
+        elif find /usr/lib64/libcackey.so > /dev/null 2>&1; then # Common
             if ! grep 'library=/usr/lib64/libcackey.so\|name=CAC Module\n' "$nss_dir/$PKCS_FILE" >/dev/null; then
                 printf "library=/usr/lib64/libcackey.so\nname=CAC Module\n" >> "$nss_dir/$PKCS_FILE"
             fi
         else
-            print_style "\n***Error No module found***\n" "danger"
+            print_style "\n***Error No module found: Please report this issue on Github***\n" "danger"
             exit "$EXIT_FAILURE"
         fi
 
