@@ -305,7 +305,7 @@ browser_check ()
 find_firefox ()
 {
     if type firefox > /dev/null; then
-        if type firefox | grep snap; then
+        if snap list | grep firefox; then
             print_style "\n***Skipping Firefox. Your firefox is currently a snap package. Please remove and install a non snap version and then rerun this script.***\n" "warning"
         else
             browser_installed=true
